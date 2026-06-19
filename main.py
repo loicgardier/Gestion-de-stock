@@ -4,9 +4,9 @@ from dotenv import dotenv_values
 from app.repositories.location_repository import LocationRepository
 from app.repositories.stock_repository import StockRepository
 from app.repositories.product_repository import ProductRepository
-from app.model.location import Location
-from app.model.product import Product
-from app.model.stock import Stock
+from app.models.location import Location
+from app.models.product import Product
+from app.models.stock import Stock
 
 from tkinter import *
 

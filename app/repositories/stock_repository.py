@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.model.stock import Stock
+from app.models.stock import Stock
 
 class StockRepository:
 

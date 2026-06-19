@@ -8,20 +8,30 @@ from app.models.location import Location
 from app.models.product import Product
 from app.models.stock import Stock
 
-from tkinter import *
+import sys
+from PySide6.QtGui import QGuiApplication, QIcon
+from PySide6.QtQml import QQmlApplicationEngine
 
+app = QGuiApplication(sys.argv)
+app.setWindowIcon(QIcon("app/images/odoo.png"))
+engine = QQmlApplicationEngine()
+engine.addImportPath(sys.path[0])
+engine.loadFromModule("App/Views", "main")
+if not engine.rootObjects():
+    sys.exit(-1)
+exit_code = app.exec()
+del engine
+sys.exit(exit_code)
+
+sys.exit(app.exec())
+
+'''
 config = dotenv_values(".env")  
 engine=create_engine(config.get("DATABASE_CONNECTION_STRING"))
 
 session_local = sessionmaker(autoflush=False,bind=engine)
 
-fenetre = Tk()
-
-label = Label(fenetre,text="Hello world")
-label.pack()
-
-fenetre.mainloop()
-
+'''
 '''
 with session_local() as session:
     location_repository = LocationRepository(session)

@@ -99,20 +99,22 @@ class SimpleUI:
             print("\t1 - Afficher la liste des produits")
             print("\t2 - Ajouter un produit")
             print("\t3 - Modifier un produit")
+            print("\t4 - Supprimer un produit")
 
             print("\n\t0 - Revenir au menu principal")
 
-            while choix<0 or choix>3:
+            while choix<0 or choix>4:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 0 et 3")
+                    print("Veillez à entrer un chiffre entre 0 et 4")
                 if choix<0 and choix>3:
-                    print("Veillez à entrer un chiffre entre 0 et 3")
+                    print("Veillez à entrer un chiffre entre 0 et 4")
             match choix:
                 case 1:self.show_product()
-                case 2:pass
+                case 2:self.add_product()
                 case 3:pass
+                case 4:pass
                 case 0:return
             choix=-1
 
@@ -123,6 +125,19 @@ class SimpleUI:
             for elem in table:
                 print(elem)
 
+    def add_product(self):
+        product=Product()
+        product.product_name=input("Entrez le nom du produit:")
+        product.product_description=input("Entrez une description:")
+        while True:
+            try:
+                product.product_base_price=float(input("Entrez le prix du produit:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            product_repository=ProductRepository(session)
+            product_repository.add(product)
 
     def product_product_variant(self):
         print("Product: Product variant")

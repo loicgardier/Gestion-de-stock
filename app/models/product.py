@@ -13,10 +13,10 @@ class Product(Base):
     product_variants : Mapped[list["ProductVariant"]] = relationship("ProductVariant",back_populates="product")
 
     def __str__(self):
-        return f"id: {self.product_id} | name: {self.product_name} | base price: {self.product_base_price} \
-            | description: {'NULL' if self.product_description is None 
-                            else self.product_description if len(self.product_description)<20 
-                            else self.product_description[:18]+'...'} \
-            | number of variant: {len(self.product_variants)}"
+        return f"   id: {self.product_id} | name: {self.product_name} | base price: {self.product_base_price} \
+| description: {'NULL' if self.product_description is None 
+                else self.product_description if len(self.product_description)<20 
+                else self.product_description[:18]+'...'} \
+| number of variant: {len(self.product_variants)}"
     def __repr__(self):
         return f"<class Product {self.product_id}>"

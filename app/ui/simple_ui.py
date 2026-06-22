@@ -1,7 +1,19 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from dotenv import dotenv_values
+
+from app.repositories.location_repository import LocationRepository
+from app.repositories.stock_repository import StockRepository
+from app.repositories.product_repository import ProductRepository
+from app.models.location import Location
+from app.models.product import Product
+from app.models.stock import Stock
 
 class SimpleUI:
     def __init__(self):
-        pass
+        self.config = dotenv_values(".env")  
+        self.engine=create_engine(self.config.get("DATABASE_CONNECTION_STRING"))
+        self.session_local = sessionmaker(autoflush=False,bind=self.engine)
 
     def run(self):
         print("Bienvenu dans l'application gestion de stock")
@@ -84,17 +96,32 @@ class SimpleUI:
         choix=-1
         while choix!=0:
             print("Entrez le chiffre corespondant a votre choix:")
+            print("\t1 - Afficher la liste des produits")
+            print("\t2 - Ajouter un produit")
+            print("\t3 - Modifier un produit")
+
             print("\n\t0 - Revenir au menu principal")
 
-            while choix<0 or choix>0:
+            while choix<0 or choix>3:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
-                if choix<1 and choix>8:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 1 et 3")
+                if choix<0 and choix>3:
+                    print("Veillez à entrer un chiffre entre 1 et 3")
             match choix:
-                case 1:pass
+                case 1:self.show_product()
+                case 2:pass
+                case 3:pass
+            choix=-1
+
+    def show_product(self):
+        with self.session_local() as session:
+            product_repository=ProductRepository(session)
+            table = product_repository.get_all()
+            for elem in table:
+                print(elem)
+
 
     def product_product_variant(self):
         print("Product: Product variant")

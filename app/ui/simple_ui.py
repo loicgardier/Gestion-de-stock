@@ -114,7 +114,7 @@ class SimpleUI:
                 case 1:self.show_product()
                 case 2:self.add_product()
                 case 3:pass
-                case 4:pass
+                case 4:self.delete_product()
                 case 0:return
             choix=-1
 
@@ -138,6 +138,26 @@ class SimpleUI:
         with self.session_local() as session:
             product_repository=ProductRepository(session)
             product_repository.add(product)
+
+    def update_product(self):
+        self.show_product()
+
+    def delete_product(self):
+        self.show_product()
+        while True:
+            try:
+                id=int(input("Entrez l'id du produit à supprimer:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            product_repository=ProductRepository(session)
+            product = product_repository.get_one(id)
+            if product is None:
+                print("Produit non trouvé")
+            else:
+                product_repository.delete(product)
+                print("Produit supprimé")
 
     def product_product_variant(self):
         print("Product: Product variant")

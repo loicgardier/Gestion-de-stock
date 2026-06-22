@@ -16,5 +16,10 @@ class ProductVariant(Base):
     stocks : Mapped[list["Stock"]] = relationship("Stock",back_populates="product_variant")
     product : Mapped["Product"] = relationship("Product",back_populates="product_variants",uselist=False)
 
+    def __str__(self):
+        return f"id: {self.product_variant_id} | color: {self.product_variant_color} | size: {
+            self.product_variant_size
+        } | price: {self.product_variant_price}"
+
     def __repr__(self):
         return f"<class ProductVariant {self.product_variant_id}>"

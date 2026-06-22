@@ -21,6 +21,8 @@ class ProductRepository:
         if existing:
             existing.product_id=product.product_id
             existing.product_name=product.product_name
+            existing.product_description=product.product_description
+            existing.product_base_price=product.product_base_price
             self.__session.commit()
         return existing
 

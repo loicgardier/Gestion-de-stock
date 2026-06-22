@@ -3,11 +3,15 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import dotenv_values
 
 from app.repositories.location_repository import LocationRepository
-from app.repositories.stock_repository import StockRepository
-from app.repositories.product_repository import ProductRepository
 from app.models.location import Location
-from app.models.product import Product
+from app.repositories.stock_repository import StockRepository
 from app.models.stock import Stock
+from app.repositories.product_repository import ProductRepository
+from app.models.product import Product
+from app.repositories.product_variant_repository import ProductVariantRepository
+from app.models.product_variant import ProductVariant
+
+from sqlalchemy.exc import IntegrityError
 
 class SimpleUI:
     def __init__(self):
@@ -91,6 +95,7 @@ class SimpleUI:
             match choix:
                 case 1:pass
 
+#region Product product
     def product_product(self):
         print("Product: product")
         choix=-1
@@ -192,23 +197,130 @@ class SimpleUI:
             else:
                 product_repository.delete(product)
                 print("Produit supprimé")
+#endregion
 
+#region Product product_variant
     def product_product_variant(self):
         print("Product: Product variant")
         choix=-1
         while choix!=0:
             print("Entrez le chiffre corespondant a votre choix:")
+            print("\t1 - Afficher la liste des produits et les variants")
+            print("\t2 - Ajouter un variant à un produit")
+            print("\t3 - Modifier le variant d'un produit")
+            print("\t4 - Supprimer le variant d'un produit")
             print("\n\t0 - Revenir au menu principal")
 
-            while choix<0 or choix>0:
+            while choix<0 or choix>4:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
-                if choix<1 and choix>8:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 0 et 4")
+                if choix<0 and choix>4:
+                    print("Veillez à entrer un chiffre entre 0 et 4")
             match choix:
-                case 1:pass
+                case 1:self.show_product_variant()
+                case 2:self.add_product_variant()
+                case 3:self.update_product_variant()
+                case 4:self.delete_product_variant()
+                case 0:return
+            choix=-1
+
+    def show_product_variant(self):
+        with self.session_local() as session:
+            product_repository=ProductRepository(session)
+            table = product_repository.get_all()
+            for product in table:
+                print(product)
+                for variant in product.product_variants:
+                    print("\t\t",variant,sep="")
+
+    def add_product_variant(self):
+        self.show_product()
+        product_variant=ProductVariant()
+        product_variant.product_id=input("Entrez l'id du produit:")
+        with self.session_local() as session:
+            product_repository=ProductRepository(session)
+            product_variant.product = product_repository.get_one(product_variant.product_id)
+            if not product_variant.product:
+                print("Id du produit incorect")
+                return
+        product_variant.product_variant_color=input("Entrez une couleur:")
+        product_variant.product_variant_size=input("Entrez une taille:")
+        while True:
+            try:
+                val=input("Entrez le prix du variant:")
+                if val:
+                    product_variant.product_variant_price=float(val)
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            product_variant_repository=ProductVariantRepository(session)
+            try:
+                product_variant_repository.add(product_variant)
+                print("Variant ajouté")
+                print(product_variant)
+            except IntegrityError as e:
+                    print(e.__cause__)
+
+    def update_product_variant(self):
+        self.show_product_variant()
+        while True:
+            try:
+                id=int(input("Entrez l'id du produit à moddifier:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            product_variant_repository=ProductVariantRepository(session)
+            product_variant = product_variant_repository.get_one(id)
+        if product_variant is None:
+            print("Variant non trouvé")
+        else:
+            #si le champs est vide pas de modification
+            val=input("Entrez la nouvelle couleur:")
+            if val:
+                product_variant.product_variant_color=val
+            val=input("Entrez la nouvelle taille:")
+            if val:
+                product_variant.product_variant_size=val
+            while True:
+                try:
+                    val=input("Entrez le prix du produit:")
+                    if val:
+                        product_variant.product_variant_price=float(val)
+                    break
+                except:
+                    pass
+            with self.session_local() as session:
+                product_variant_repository=ProductVariantRepository(session)
+                try:
+                    product_variant_repository.update(id,product_variant)
+                    print("Variant modifié")
+                    print(product_variant)
+                except IntegrityError as e:
+                    print(e.__cause__)
+
+
+    def delete_product_variant(self):
+        self.show_product_variant()
+        while True:
+            try:
+                id=int(input("Entrez l'id du variant à supprimer:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            product_variant_repository=ProductVariantRepository(session)
+            product_variant = product_variant_repository.get_one(id)
+            if product_variant is None:
+                print("Variant non trouvé")
+            else:
+                product_variant_repository.delete(product_variant)
+                print("Produit supprimé")
+
+#endregion
 
     def reporting_location(self):
         print("Reporting: location")

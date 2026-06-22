@@ -113,7 +113,7 @@ class SimpleUI:
             match choix:
                 case 1:self.show_product()
                 case 2:self.add_product()
-                case 3:pass
+                case 3:self.update_product()
                 case 4:self.delete_product()
                 case 0:return
             choix=-1
@@ -138,9 +138,43 @@ class SimpleUI:
         with self.session_local() as session:
             product_repository=ProductRepository(session)
             product_repository.add(product)
+            print("Produit ajouté")
+            print(product)
 
     def update_product(self):
         self.show_product()
+        while True:
+            try:
+                id=int(input("Entrez l'id du produit à moddifier:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            product_repository=ProductRepository(session)
+            product = product_repository.get_one(id)
+        if product is None:
+            print("Produit non trouvé")
+        else:
+            #si le champs est vide pas de modification
+            val=input("Entrez le nouveau nom:")
+            if val:
+                product.product_name=val
+            val=input("Entrez la nouvelle description:")
+            if val:
+                product.product_description=val
+            while True:
+                try:
+                    val=input("Entrez le prix du produit:")
+                    if val:
+                        product.product_base_price=float(val)
+                    break
+                except:
+                    pass
+            with self.session_local() as session:
+                product_repository=ProductRepository(session)
+                product_repository.update(id,product)
+            print("Produit modifié")
+            print(product)
 
     def delete_product(self):
         self.show_product()

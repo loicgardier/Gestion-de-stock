@@ -113,6 +113,7 @@ class SimpleUI:
                 case 1:self.show_product()
                 case 2:pass
                 case 3:pass
+                case 0:return
             choix=-1
 
     def show_product(self):

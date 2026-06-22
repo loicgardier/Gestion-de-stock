@@ -9,7 +9,7 @@ class ProductRepository:
     def get_one(self,id:int)-> Product :
         return self.__session.get(Product,id)
     def get_all(self):
-        return self.__session.query(Product).all()
+        return self.__session.query(Product).order_by(Product.product_id).all()
     
     def add(self,product:Product)->Product:
         self.__session.add(product)

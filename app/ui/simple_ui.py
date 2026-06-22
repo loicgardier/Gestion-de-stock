@@ -106,9 +106,9 @@ class SimpleUI:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 1 et 3")
+                    print("Veillez à entrer un chiffre entre 0 et 3")
                 if choix<0 and choix>3:
-                    print("Veillez à entrer un chiffre entre 1 et 3")
+                    print("Veillez à entrer un chiffre entre 0 et 3")
             match choix:
                 case 1:self.show_product()
                 case 2:pass

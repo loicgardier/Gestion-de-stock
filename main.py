@@ -7,6 +7,11 @@ from app.repositories.product_repository import ProductRepository
 from app.models.location import Location
 from app.models.product import Product
 from app.models.stock import Stock
+from app.ui.simple_ui import SimpleUI
+
+SimpleUI().run()
+
+
 
 
 

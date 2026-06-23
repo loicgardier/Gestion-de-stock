@@ -3,6 +3,7 @@ from sqlalchemy import or_
 from app.models.zone import Zone
 from app.models.zone_distance import ZoneDistance
 from app.models.location import Location
+from app.models.vendor import Vendor
 
 class ZoneRepository:
     
@@ -34,6 +35,9 @@ class ZoneRepository:
         locations = self.__session.query(Location).where(Location.zone_id==zone.zone_id)
         for location in locations:
             location.zone_id=1
+        vendors = self.__session.query(Vendor).where(Vendor.zone_id==zone.zone_id)
+        for vendor in vendors:
+            vendor.zone_id=1
         self.__session.flush()
         self.__session.delete(zone)
         self.__session.commit()

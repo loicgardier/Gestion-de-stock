@@ -14,6 +14,8 @@ from app.models.zone import Zone
 from app.repositories.zone_repository import ZoneRepository
 from app.models.zone_distance import ZoneDistance
 from app.repositories.zone_distance_repository import ZoneDistanceRepository
+from app.models.vendor import Vendor
+from app.repositories.vendor_repository import VendorRepository
 
 from sqlalchemy.exc import IntegrityError
 
@@ -644,19 +646,126 @@ class SimpleUI:
 
 #endregion
 
+#region Configuration vendor
+
     def configuration_vendor(self):
-        print("configuration: vendor")
+        print("Configuration: vendor")
         choix=-1
-        while choix!=0:
+        while True:
             print("Entrez le chiffre corespondant a votre choix:")
+            print("\t1 - Afficher les vendeurs")
+            print("\t2 - Ajouter un vendeurs")
+            print("\t3 - Modifier un vendeur")
+            print("\t4 - Supprimer un vendeur")
+            print("\t5 - Modifier le catalogue d'un vendeur")
             print("\n\t0 - Revenir au menu principal")
 
-            while choix<0 or choix>0:
+            while choix<0 or choix>9:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 0 et 5")
                 if choix<1 and choix>8:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 0 et 5")
             match choix:
-                case 1:pass
+                case 1:self.show_vendor()
+                case 2:self.add_vendor()
+                case 3:self.update_vendor()
+                case 4:self.delete_vendor()
+                case 0:return
+            choix=-1  
+
+
+    def show_vendor(self):
+            with self.session_local() as session:
+                vendor_repository=VendorRepository(session)
+                table = vendor_repository.get_all()
+                for vendor in table:
+                    print("\t",vendor,sep="")
+
+    def add_vendor(self):
+        vendor=Vendor()
+        vendor.vendor_name=input("Entrez le nom du vendeur:")
+        self.show_zone()
+        while True:
+            try:
+                id=int(input("Entrez l'id de la zone dans laquel se trouve le vendeur:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            zone = zone_repository.get_one(id)
+            if zone is None:
+                print("Zone non trouvé")
+                return
+            vendor.zone_id=id
+            vendor_repository=VendorRepository(session)
+            vendor=vendor_repository.add(vendor)
+            print("Vendeur ajouté")
+            print("\t",vendor,sep="")
+
+
+    def update_vendor(self):
+        self.show_vendor()
+        while True:
+            try:
+                id=int(input("Entrez l'id du vendeur à moddifier:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            vendor_repository=VendorRepository(session)
+            vendor = vendor_repository.get_one(id)
+        if vendor is None:
+            print("Vendeur non trouvé")
+        else:
+            #si le champs est vide pas de modification
+            val=input("Entrez le nouveau nom:")
+            if val:
+                vendor.vendor_name=val
+            self.show_zone()
+
+            while True:
+                try:
+                    val = input("Entrez l'id de la zone dans laquel se trouve la location:")
+                    if val:
+                        id_zone=int(val)
+                    else:
+                        id_zone=None
+                    break
+                except:
+                    pass
+            with self.session_local() as session:
+                zone_repository=ZoneRepository(session)
+                #carefull with NONE
+                zone = zone_repository.get_one(id_zone)
+                if zone is None:
+                    pass
+                else:
+                    vendor.zone_id=id_zone
+
+            with self.session_local() as session:
+                vendor_repository=VendorRepository(session)
+                vendor=vendor_repository.update(id,vendor)
+                print("Vendeur modifié")
+                print("\t",vendor,sep="")
+
+    def delete_vendor(self):
+        self.show_vendor()
+        while True:
+            try:
+                id=int(input("Entrez l'id du vendeur à supprimer:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            vendor_repository=VendorRepository(session)
+            vendor = vendor_repository.get_one(id)
+            if vendor is None:
+                print("Vendeur non trouvé")
+            else:
+                vendor_repository.delete(vendor)
+                print("Vendeur supprimé")
+
+#endregion

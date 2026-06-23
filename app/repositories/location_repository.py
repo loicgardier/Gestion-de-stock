@@ -9,7 +9,7 @@ class LocationRepository:
     def get_one(self,id:int)-> Location :
         return self.__session.get(Location,id)
     def get_all(self):
-        return self.__session.query(Location).all()
+        return self.__session.query(Location).order_by(Location.location_id).all()
     
     def add(self,location:Location)->Location:
         self.__session.add(location)
@@ -21,6 +21,7 @@ class LocationRepository:
         if existing:
             existing.location_id=location.location_id
             existing.location_name=location.location_name
+            existing.zone_id=location.zone_id
             self.__session.commit()
         return existing
 

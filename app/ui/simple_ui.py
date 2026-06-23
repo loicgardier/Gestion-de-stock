@@ -391,10 +391,10 @@ class SimpleUI:
                 case 3:self.update_zone()
                 case 4:self.delete_zone()
                 case 5:self.configure_zone_distance()
-                case 6:pass
-                case 7:pass
-                case 8:pass
-                case 9:pass
+                case 6:self.show_location()
+                case 7:self.add_location()
+                case 8:self.update_location()
+                case 9:self.delete_location()
                 case 0:return
             choix=-1  
 
@@ -564,6 +564,97 @@ class SimpleUI:
             
             print("\t",zone_distance_1,sep="")
             print("\t",zone_distance_2,sep="")
+
+    def show_location(self):
+            with self.session_local() as session:
+                location_repository=LocationRepository(session)
+                table = location_repository.get_all()
+                for location in table:
+                    print("\t",location,sep="")
+
+    def add_location(self):
+        location=Location()
+        location.location_name=input("Entrez le nom de la location:")
+        self.show_zone()
+        while True:
+            try:
+                id=int(input("Entrez l'id de la zone dans laquel se trouve la location:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            zone = zone_repository.get_one(id)
+            if zone is None:
+                print("Zone non trouvé")
+                return
+            location.zone_id=id
+            location_repository=LocationRepository(session)
+            location=location_repository.add(location)
+            print("Location ajouté")
+            print("\t",location,sep="")
+
+
+    def update_location(self):
+        self.show_location()
+        while True:
+            try:
+                id=int(input("Entrez l'id de la location à moddifier:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            location_repository=LocationRepository(session)
+            location = location_repository.get_one(id)
+        if location is None:
+            print("Location non trouvé")
+        else:
+            #si le champs est vide pas de modification
+            val=input("Entrez le nouveau nom:")
+            if val:
+                location.location_name=val
+            self.show_zone()
+
+            while True:
+                try:
+                    val = input("Entrez l'id de la zone dans laquel se trouve la location:")
+                    if val:
+                        id_zone=int(val)
+                    else:
+                        id_zone=None
+                    break
+                except:
+                    pass
+            with self.session_local() as session:
+                zone_repository=ZoneRepository(session)
+                zone = zone_repository.get_one(id_zone)
+                if zone is None:
+                    pass
+                else:
+                    location.zone_id=id_zone
+
+            with self.session_local() as session:
+                location_repository=LocationRepository(session)
+                location=location_repository.update(id,location)
+                print("Location modifié")
+                print("\t",location,sep="")
+
+    def delete_location(self):
+        self.show_location()
+        while True:
+            try:
+                id=int(input("Entrez l'id de la location à supprimer:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            location_repository=LocationRepository(session)
+            location = location_repository.get_one(id)
+            if location is None:
+                print("Location non trouvé")
+            else:
+                location_repository.delete(location)
+                print("Location supprimé")
 
 #endregion
 

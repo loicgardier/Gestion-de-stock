@@ -1,5 +1,8 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.models.zone import Zone
+from app.models.zone_distance import ZoneDistance
+from app.models.location import Location
 
 class ZoneRepository:
     
@@ -25,5 +28,12 @@ class ZoneRepository:
         return existing
 
     def delete(self,zone:Zone):
+        self.__session.query(ZoneDistance)\
+            .where(or_( ZoneDistance.zone_id_1==zone.zone_id, ZoneDistance.zone_id_2 == zone.zone_id))\
+            .delete()
+        locations = self.__session.query(Location).where(Location.zone_id==zone.zone_id)
+        for location in locations:
+            location.zone_id=1
+        self.__session.flush()
         self.__session.delete(zone)
         self.__session.commit()

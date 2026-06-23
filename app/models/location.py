@@ -16,4 +16,4 @@ class Location(Base):
         return f"<Location {self.location_name}>"
     
     def __str__(self):
-        return f"id: {self.location_id} | name: {self.location_name} | zone: {self.zone.zone_name if self.zone else 'NULL'}"
+        return f"id: {self.location_id} | name: {self.location_name} | zone: {self.zone.zone_name}"

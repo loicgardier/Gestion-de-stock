@@ -14,6 +14,7 @@ class ProductVariant(Base):
     product_variant_price: Mapped[float] = mapped_column(Float,nullable=False,server_default='0')
 
     stocks : Mapped[list["Stock"]] = relationship("Stock",back_populates="product_variant")
+    catalogs : Mapped[list["Catalog"]] =relationship("Catalog",back_populates="product_variant")
     product : Mapped["Product"] = relationship("Product",back_populates="product_variants",uselist=False)
 
     def __str__(self):

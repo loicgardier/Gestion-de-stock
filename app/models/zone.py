@@ -11,10 +11,10 @@ class Zone(Base):
     locations : Mapped[list["Location"]] = relationship("Location",back_populates="zone")
     zone_distances_1 : Mapped[list["ZoneDistance"]] = relationship("ZoneDistance",
                                                                   foreign_keys="ZoneDistance.zone_id_1",
-                                                                  back_populates="zones_1")
+                                                                  back_populates="zone_1")
     zone_distances_2 : Mapped[list["ZoneDistance"]] = relationship("ZoneDistance",
                                                                   foreign_keys="ZoneDistance.zone_id_2",
-                                                                  back_populates="zones_2")
+                                                                  back_populates="zone_2")
     def __repr__(self):
         return f"<Zone {self.zone_name}>"
     

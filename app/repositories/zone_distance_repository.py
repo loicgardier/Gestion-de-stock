@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.models.zone_distance import ZoneDistance
 
-class ZoneRepository:
+class ZoneDistanceRepository:
     
     def __init__(self,session:Session):
         self.__session=session
@@ -10,7 +11,7 @@ class ZoneRepository:
         return self.__session.get(ZoneDistance,id)
     
     def get_by_zone(self,id:int)->list[ZoneDistance]:
-        return self.__session.query(ZoneDistance).where(ZoneDistance.zone_id_1==id or ZoneDistance.zone_id_2==id).all()
+        return self.__session.query(ZoneDistance).where( or_(ZoneDistance.zone_id_1==id, ZoneDistance.zone_id_2==id)).all()
     
     def get_all(self)->list[ZoneDistance]:
         return self.__session.query(ZoneDistance).all()

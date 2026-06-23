@@ -12,6 +12,8 @@ from app.repositories.product_variant_repository import ProductVariantRepository
 from app.models.product_variant import ProductVariant
 from app.models.zone import Zone
 from app.repositories.zone_repository import ZoneRepository
+from app.models.zone_distance import ZoneDistance
+from app.repositories.zone_distance_repository import ZoneDistanceRepository
 
 from sqlalchemy.exc import IntegrityError
 
@@ -388,7 +390,7 @@ class SimpleUI:
                 case 2:self.add_zone()
                 case 3:self.update_zone()
                 case 4:self.delete_zone()
-                case 5:pass
+                case 5:self.configure_zone_distance()
                 case 6:pass
                 case 7:pass
                 case 8:pass
@@ -452,8 +454,116 @@ class SimpleUI:
             else:
                 zone_repository.delete(zone)
                 print("Zone supprimé")
+
     def configure_zone_distance(self):
-        pass
+        self.show_zone()
+        while True:
+            try:
+                id_1=int(input("Entrez l'id de la zone à configurer:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            zone = zone_repository.get_one(id_1)
+            if zone is None:
+                print("Zone non trouvé")
+                return
+            zone_distance_repository=ZoneDistanceRepository(session)
+            existing =zone_distance_repository.get_by_zone(id_1)
+            print(f"Distance configurée: {len(existing)//2}")
+            for zone_distance in existing:
+                print("\t",zone_distance,sep="")
+        while True:
+            try:
+                id_2=int(input("Entrez l'id de la zone avec laquelle la distance va être ajouté:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            zone = zone_repository.get_one(id_2)
+            if zone is None:
+                print("Zone non trouvé")
+                return
+            if id_1==id_2:
+                print("la distance doit être calculer entre 2 location différente")
+                return
+            
+            zone_distance_repository=ZoneDistanceRepository(session)
+
+            existing=zone_distance_repository.get_one((id_1,id_2))
+            existing2=zone_distance_repository.get_one((id_2,id_1))
+            if existing:
+                while True:
+                    try:
+                        val=input("Entrez la distance de la zone 1 vers la zone 2:")
+                        if val:
+                            distance_aller=float(val)
+                        else:
+                            distance_aller=existing.zone_distance
+                        break
+                    except:
+                        pass
+                while True:
+                    try:
+                        val=input("Entrez la distance de la zone 2 vers la zone 1:")
+                        if val:
+                            distance_retour=float(val)
+                        else:
+                            distance_retour=existing2.zone_distance
+                        break
+                    except:
+                        pass
+
+                zone_distance_1 = ZoneDistance()
+                zone_distance_1.zone_id_1=id_1
+                zone_distance_1.zone_id_2=id_2
+                zone_distance_1.zone_distance=distance_aller
+                zone_distance_2 = ZoneDistance()
+                zone_distance_2.zone_id_1=id_2
+                zone_distance_2.zone_id_2=id_1
+                zone_distance_2.zone_distance=distance_retour
+                
+                zone_distance_repository=ZoneDistanceRepository(session)
+                zone_distance_1=zone_distance_repository.update((id_1,id_2),zone_distance_1)
+                zone_distance_2=zone_distance_repository.update((id_2,id_1),zone_distance_2)
+
+                print("Distance modifiée")
+
+            else:
+                while True:
+                    try:
+                        distance_aller=float(input("Entrez la distance de la zone 1 vers la zone 2:"))
+                        break
+                    except:
+                        pass
+                while True:
+                    try:
+                        val=input("Entrez la distance de la zone 2 vers la zone 1:")
+                        if val:
+                            distance_retour=float(val)
+                        else:
+                            distance_retour=distance_aller
+                        break
+                    except:
+                        pass
+                zone_distance_1 = ZoneDistance()
+                zone_distance_1.zone_id_1=id_1
+                zone_distance_1.zone_id_2=id_2
+                zone_distance_1.zone_distance=distance_aller
+                zone_distance_2 = ZoneDistance()
+                zone_distance_2.zone_id_1=id_2
+                zone_distance_2.zone_id_2=id_1
+                zone_distance_2.zone_distance=distance_retour
+                
+                zone_distance_repository=ZoneDistanceRepository(session)
+                zone_distance_1=zone_distance_repository.add(zone_distance_1)
+                zone_distance_2=zone_distance_repository.add(zone_distance_2)
+                print("Distance ajoutée")
+            
+            print("\t",zone_distance_1,sep="")
+            print("\t",zone_distance_2,sep="")
 
 #endregion
 

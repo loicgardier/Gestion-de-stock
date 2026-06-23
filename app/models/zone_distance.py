@@ -9,10 +9,10 @@ class ZoneDistance(Base):
     zone_id_2 : Mapped[int] = mapped_column(Integer,ForeignKey('zone.zone_id'),primary_key=True)
     zone_distance: Mapped[float] = mapped_column(Float,nullable=False)
 
-    zones_1 : Mapped[list["Zone"]] = relationship("Zone",foreign_keys=[zone_id_1],back_populates="zone_distances_1")
-    zones_2 : Mapped[list["Zone"]] = relationship("Zone",foreign_keys=[zone_id_2],back_populates="zone_distances_2")
+    zone_1 : Mapped["Zone"] = relationship("Zone",foreign_keys=[zone_id_1],back_populates="zone_distances_1",uselist=False)
+    zone_2 : Mapped["Zone"] = relationship("Zone",foreign_keys=[zone_id_2],back_populates="zone_distances_2",uselist=False)
 
     def __repr__(self):
         return f"<ZoneDistance {self.zone_id_1} - {self.zone_id_2} >"
     def __str__(self):
-        return f"zone 1: {self.zone_id_1} | zone 2: {self.zone_id_2} | distance: {self.zone_distance}"
+        return f"zone 1: {self.zone_1.zone_name} | zone 2: {self.zone_2.zone_name} | distance: {self.zone_distance}"

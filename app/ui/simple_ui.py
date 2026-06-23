@@ -10,6 +10,8 @@ from app.repositories.product_repository import ProductRepository
 from app.models.product import Product
 from app.repositories.product_variant_repository import ProductVariantRepository
 from app.models.product_variant import ProductVariant
+from app.models.zone import Zone
+from app.repositories.zone_repository import ZoneRepository
 
 from sqlalchemy.exc import IntegrityError
 
@@ -128,7 +130,7 @@ class SimpleUI:
             product_repository=ProductRepository(session)
             table = product_repository.get_all()
             for elem in table:
-                print(elem)
+                print("\t",elem,sep="")
 
     def add_product(self):
         product=Product()
@@ -144,7 +146,7 @@ class SimpleUI:
             product_repository=ProductRepository(session)
             product_repository.add(product)
             print("Produit ajouté")
-            print(product)
+            print("\t",product,sep="")
 
     def update_product(self):
         self.show_product()
@@ -179,7 +181,7 @@ class SimpleUI:
                 product_repository=ProductRepository(session)
                 product_repository.update(id,product)
             print("Produit modifié")
-            print(product)
+            print("\t",product,sep="")
 
     def delete_product(self):
         self.show_product()
@@ -231,7 +233,7 @@ class SimpleUI:
             product_repository=ProductRepository(session)
             table = product_repository.get_all()
             for product in table:
-                print(product)
+                print("\t",product,sep="")
                 for variant in product.product_variants:
                     print("\t\t",variant,sep="")
 
@@ -356,7 +358,7 @@ class SimpleUI:
             match choix:
                 case 1:pass
 
-
+#region Configuration location
 
     def configuration_location(self):
         print("Configuration: location")
@@ -382,20 +384,78 @@ class SimpleUI:
                 if choix<1 and choix>8:
                     print("Veillez à entrer un chiffre entre 0 et 9")
             match choix:
-                case 1:pass
-                case 2:pass
-                case 3:pass
-                case 4:pass
+                case 1:self.show_zone()
+                case 2:self.add_zone()
+                case 3:self.update_zone()
+                case 4:self.delete_zone()
                 case 5:pass
                 case 6:pass
                 case 7:pass
                 case 8:pass
                 case 9:pass
                 case 0:return
-            choix=-1
+            choix=-1  
 
-    
+    def show_zone(self):
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            table = zone_repository.get_all()
+            for zone in table:
+                print("\t",zone,sep="")
 
+    def add_zone(self):
+        zone=Zone()
+        zone.zone_name=input("Entrez le nom de la zone:")
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            zone_repository.add(zone)
+            print("Zone ajouté")
+            print("\t",zone,sep="")
+
+    def update_zone(self):
+        self.show_zone()
+        while True:
+            try:
+                id=int(input("Entrez l'id de la zone à moddifier:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            zone = zone_repository.get_one(id)
+        if zone is None:
+            print("Zone non trouvé")
+        else:
+            #si le champs est vide pas de modification
+            val=input("Entrez le nouveau nom:")
+            if val:
+                zone.zone_name=val
+            with self.session_local() as session:
+                zone_repository=ZoneRepository(session)
+                zone_repository.update(id,zone)
+            print("zone modifié")
+            print("\t",zone,sep="")
+
+    def delete_zone(self):
+        self.show_zone()
+        while True:
+            try:
+                id=int(input("Entrez l'id de la zone à supprimer:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            zone_repository=ZoneRepository(session)
+            zone = zone_repository.get_one(id)
+            if zone is None:
+                print("Zone non trouvé")
+            else:
+                zone_repository.delete(zone)
+                print("Zone supprimé")
+    def configure_zone_distance(self):
+        pass
+
+#endregion
 
     def configuration_vendor(self):
         print("configuration: vendor")

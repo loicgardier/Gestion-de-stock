@@ -11,3 +11,8 @@ class ZoneDistance(Base):
 
     zones_1 : Mapped[list["Zone"]] = relationship("Zone",foreign_keys=[zone_id_1],back_populates="zone_distances_1")
     zones_2 : Mapped[list["Zone"]] = relationship("Zone",foreign_keys=[zone_id_2],back_populates="zone_distances_2")
+
+    def __repr__(self):
+        return f"<ZoneDistance {self.zone_id_1} - {self.zone_id_2} >"
+    def __str__(self):
+        return f"zone 1: {self.zone_id_1} | zone 2: {self.zone_id_2} | distance: {self.zone_distance}"

@@ -11,3 +11,9 @@ class Location(Base):
 
     stocks : Mapped[list["Stock"]] = relationship("Stock",back_populates="location")
     zone : Mapped["Zone"] =relationship("Zone",back_populates="locations",uselist=False)
+
+    def __repr__(self):
+        return f"<Location {self.location_name}>"
+    
+    def __str__(self):
+        return f"id: {self.location_id} | name: {self.location_name} | zone: {self.zone.zone_name if self.zone else 'NULL'}"

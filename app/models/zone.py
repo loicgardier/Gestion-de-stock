@@ -15,3 +15,8 @@ class Zone(Base):
     zone_distances_2 : Mapped[list["ZoneDistance"]] = relationship("ZoneDistance",
                                                                   foreign_keys="ZoneDistance.zone_id_2",
                                                                   back_populates="zones_2")
+    def __repr__(self):
+        return f"<Zone {self.zone_name}>"
+    
+    def __str__(self):
+        return f"id: {self.zone_id} | name: {self.zone_name}"

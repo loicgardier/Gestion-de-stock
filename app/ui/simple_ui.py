@@ -99,7 +99,7 @@ class SimpleUI:
     def product_product(self):
         print("Product: product")
         choix=-1
-        while choix!=0:
+        while True:
             print("Entrez le chiffre corespondant a votre choix:")
             print("\t1 - Afficher la liste des produits")
             print("\t2 - Ajouter un produit")
@@ -203,7 +203,7 @@ class SimpleUI:
     def product_product_variant(self):
         print("Product: Product variant")
         choix=-1
-        while choix!=0:
+        while True:
             print("Entrez le chiffre corespondant a votre choix:")
             print("\t1 - Afficher la liste des produits et les variants")
             print("\t2 - Ajouter un variant à un produit")
@@ -356,22 +356,46 @@ class SimpleUI:
             match choix:
                 case 1:pass
 
+
+
     def configuration_location(self):
         print("Configuration: location")
         choix=-1
-        while choix!=0:
+        while True:
             print("Entrez le chiffre corespondant a votre choix:")
+            print("\t1 - Afficher les zones")
+            print("\t2 - Ajouter une zone")
+            print("\t3 - Modifier une zone")
+            print("\t4 - Supprimer une zone")
+            print("\t5 - Configurer la distance entre deux zone")
+            print("\t6 - Afficher les location")
+            print("\t7 - Ajouter une location")
+            print("\t8 - Modifier une location")
+            print("\t9 - Supprimer une location")
             print("\n\t0 - Revenir au menu principal")
 
-            while choix<0 or choix>0:
+            while choix<0 or choix>9:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 0 et 9")
                 if choix<1 and choix>8:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 0 et 9")
             match choix:
                 case 1:pass
+                case 2:pass
+                case 3:pass
+                case 4:pass
+                case 5:pass
+                case 6:pass
+                case 7:pass
+                case 8:pass
+                case 9:pass
+                case 0:return
+            choix=-1
+
+    
+
 
     def configuration_vendor(self):
         print("configuration: vendor")

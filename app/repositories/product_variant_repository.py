@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.product_variant import ProductVariant
+from app.models.stock import Stock
+from app.models.catalog import Catalog
 
 class ProductVariantRepository:
 
@@ -36,5 +38,8 @@ class ProductVariantRepository:
         return existing
 
     def delete(self,product_variant:ProductVariant):
+        self.__session.query(Stock.product_variant_id==product_variant.product_variant_id).delete()
+        self.__session.query(Catalog.product_variant_id==product_variant.product_variant_id).delete()
+        self.__session.flush()
         self.__session.delete(product_variant)
         self.__session.commit()

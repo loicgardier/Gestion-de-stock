@@ -672,6 +672,7 @@ class SimpleUI:
                 case 2:self.add_vendor()
                 case 3:self.update_vendor()
                 case 4:self.delete_vendor()
+                case 5:self.update_catalog()
                 case 0:return
             choix=-1  
 
@@ -767,5 +768,8 @@ class SimpleUI:
             else:
                 vendor_repository.delete(vendor)
                 print("Vendeur supprimé")
+
+    def update_catalog(self):
+        pass
 
 #endregion

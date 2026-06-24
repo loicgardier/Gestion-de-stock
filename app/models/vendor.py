@@ -11,7 +11,7 @@ class Vendor(Base):
 
     catalogs : Mapped[list["Catalog"]] = relationship("Catalog",back_populates="vendor")
     zone : Mapped["Zone"] =relationship("Zone",back_populates="vendors",uselist=False)
-
+    location_orders : Mapped[list["LocationOrder"]] =relationship("LocationOrder",back_populates="vendor")
     def __repr__(self):
         return f"<Vendor {self.vendor_name}>"
     

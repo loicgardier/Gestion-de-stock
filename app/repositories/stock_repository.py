@@ -21,7 +21,7 @@ class StockRepository:
         if existing:
             existing.product_id=stock.product_id
             existing.location_id=stock.location_id
-            existing.quantity=stock.quantity
+            existing.stock_quantity=stock.stock_quantity
             self.__session.commit()
         return existing
 

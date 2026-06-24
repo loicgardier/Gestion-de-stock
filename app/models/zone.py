@@ -10,6 +10,7 @@ class Zone(Base):
 
     locations : Mapped[list["Location"]] = relationship("Location",back_populates="zone")
     vendors : Mapped[list["Vendor"]] = relationship("Vendor",back_populates="zone")
+    users : Mapped[list["User"]] = relationship("User",back_populates="zone")
     zone_distances_1 : Mapped[list["ZoneDistance"]] = relationship("ZoneDistance",
                                                                   foreign_keys="ZoneDistance.zone_id_1",
                                                                   back_populates="zone_1")

@@ -7,7 +7,7 @@ class Stock(Base):
 
     product_variant_id: Mapped[int] = mapped_column(Integer,ForeignKey('product_variant.product_variant_id'),primary_key=True)
     location_id : Mapped[int] = mapped_column(Integer,ForeignKey('location.location_id'),primary_key=True)
-    quantity : Mapped[int] = mapped_column(Integer,nullable=False)
+    stock_quantity : Mapped[int] = mapped_column(Integer,nullable=False)
 
     product_variant : Mapped["ProductVariant"] = relationship("ProductVariant",back_populates="stocks",uselist=False) 
     location : Mapped["Location"] = relationship("Location",back_populates="stocks",uselist=False)

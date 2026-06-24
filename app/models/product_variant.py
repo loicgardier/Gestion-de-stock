@@ -17,6 +17,10 @@ class ProductVariant(Base):
     catalogs : Mapped[list["Catalog"]] =relationship("Catalog",back_populates="product_variant")
     product : Mapped["Product"] = relationship("Product",back_populates="product_variants",uselist=False)
 
+    location_oder_product_variants : Mapped[list["LocationOrderProductVariant"]] = relationship("LocationOrderProductVariant",back_populates="product_variant")
+    transfert_oder_product_variants : Mapped[list["TransfertOrderProductVariant"]] = relationship("TransfertOrderProductVariant",back_populates="product_variant")
+    user_oder_product_variants : Mapped[list["UserOrderProductVariant"]] = relationship("UserOrderProductVariant",back_populates="product_variant")
+
     def __str__(self):
         return f"id: {self.product_variant_id} | color: {self.product_variant_color} | size: {
             self.product_variant_size

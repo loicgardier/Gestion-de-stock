@@ -2,8 +2,9 @@
 from .base import Base
 from sqlalchemy.orm import relationship,Mapped,mapped_column
 from sqlalchemy import Integer,ForeignKey
+from .order import Order
 
-class TransfertOrder(Base):
+class TransfertOrder(Base,Order):
     __tablename__ = "transfert_order"
 
     transfert_order_id : Mapped[int] = mapped_column(Integer,primary_key=True)

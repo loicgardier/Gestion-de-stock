@@ -2,8 +2,9 @@
 from .base import Base
 from sqlalchemy.orm import relationship,Mapped,mapped_column
 from sqlalchemy import Integer,ForeignKey
+from .order import Order
 
-class UserOrder(Base):
+class UserOrder(Base,Order):
     __tablename__ = "user_order"
 
     user_order_id : Mapped[int] = mapped_column(Integer,primary_key=True)

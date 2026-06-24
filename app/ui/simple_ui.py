@@ -36,8 +36,8 @@ class SimpleUI:
         while choix!=0:
             print("Entrez le chiffre corespondant a votre choix:")
             print("Operation:")
-            print("\t1 - transfert")
-            print("\t2 - replenishment")
+            print("\t1 - location")
+            print("\t2 - user")
             print("Products")
             print("\t3 - product")
             print("\t4 - product variant")
@@ -55,8 +55,8 @@ class SimpleUI:
                 if choix<1 and choix>8:
                     print("Veillez à entrer un chiffre entre 0 et 8")
             match choix:
-                case 1: self.operation_transfert()
-                case 2: self.operation_replenishment()
+                case 1: self.operation_location()
+                case 2: self.operation_user()
                 case 3: self.product_product()
                 case 4: self.product_product_variant()
                 case 5: self.configuration_zone()
@@ -65,8 +65,8 @@ class SimpleUI:
                 case 0: return
             choix=-1
 
-    def operation_transfert(self):
-        print("Operation: transfert")
+    def operation_location(self):
+        print("Operation: location")
         choix=-1
         while choix!=0:
             print("Entrez le chiffre corespondant a votre choix:")
@@ -83,8 +83,8 @@ class SimpleUI:
                 case 1:pass
 
 
-    def operation_replenishment(self):
-        print("Operation: reple,ishment")
+    def operation_user(self):
+        print("Operation: user")
         choix=-1
         while choix!=0:
             print("Entrez le chiffre corespondant a votre choix:")

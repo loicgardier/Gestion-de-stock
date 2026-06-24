@@ -16,6 +16,8 @@ from app.models.zone_distance import ZoneDistance
 from app.repositories.zone_distance_repository import ZoneDistanceRepository
 from app.models.vendor import Vendor
 from app.repositories.vendor_repository import VendorRepository
+from app.models.catalog import Catalog
+from app.repositories.catalog_repository import CatalogRepository
 
 from sqlalchemy.exc import IntegrityError
 
@@ -241,7 +243,12 @@ class SimpleUI:
     def add_product_variant(self):
         self.show_product()
         product_variant=ProductVariant()
-        product_variant.product_id=input("Entrez l'id du produit:")
+        while True:
+            try:
+                product_variant.product_id=int(input("Entrez l'id du produit:"))
+                break
+            except:
+                pass
         with self.session_local() as session:
             product_repository=ProductRepository(session)
             product_variant.product = product_repository.get_one(product_variant.product_id)
@@ -657,22 +664,24 @@ class SimpleUI:
             print("\t2 - Ajouter un vendeurs")
             print("\t3 - Modifier un vendeur")
             print("\t4 - Supprimer un vendeur")
-            print("\t5 - Modifier le catalogue d'un vendeur")
+            print("\t5 - Afficher le catalogue d'un vendeur")
+            print("\t6 - Modifier le catalogue d'un vendeur")
             print("\n\t0 - Revenir au menu principal")
 
-            while choix<0 or choix>9:
+            while choix<0 or choix>6:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 0 et 5")
-                if choix<1 and choix>8:
-                    print("Veillez à entrer un chiffre entre 0 et 5")
+                    print("Veillez à entrer un chiffre entre 0 et 6")
+                if choix<0 and choix>6:
+                    print("Veillez à entrer un chiffre entre 0 et 6")
             match choix:
                 case 1:self.show_vendor()
                 case 2:self.add_vendor()
                 case 3:self.update_vendor()
                 case 4:self.delete_vendor()
-                case 5:self.update_catalog()
+                case 5:self.show_vendor_catalog()
+                case 6:self.update_catalog()
                 case 0:return
             choix=-1  
 
@@ -769,7 +778,102 @@ class SimpleUI:
                 vendor_repository.delete(vendor)
                 print("Vendeur supprimé")
 
+    def show_vendor_catalog(self,id_vendor=None):
+        if id_vendor is None:
+            self.show_vendor()
+            while True:
+                try:
+                    id_vendor=int(input("Entrez l'id du vendeur:"))
+                    break
+                except:
+                    pass
+            with self.session_local() as session:
+                vendor_repository=VendorRepository(session)
+                vendor = vendor_repository.get_one(id_vendor)
+                if vendor is None:
+                    print("Vendeur non trouvé")
+                    return
+        with self.session_local() as session:
+            catalog_repository = CatalogRepository(session)
+            rows = catalog_repository.get_by_vendor(id_vendor)
+            product=None
+            for row in rows:
+                if product is None or product!= row.product_variant.product_id:
+                    product=row.product_variant.product_id
+                    print(f"\tid: {row.product_variant.product_id} | name: {row.product_variant.product.product_name}")
+                print(f"\t\tid: {row.product_variant.product_variant_id} | size: {row.product_variant.product_variant_size} | color: {row.product_variant.product_variant_color}")
+
     def update_catalog(self):
-        pass
+        self.show_vendor()
+        while True:
+            try:
+                id_vendor=int(input("Entrez l'id du vendeur:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            vendor_repository=VendorRepository(session)
+            vendor = vendor_repository.get_one(id_vendor)
+            if vendor is None:
+                print("Vendeur non trouvé")
+                return
+        while True:
+            print("Catalogue du vendeur")
+            self.show_vendor_catalog(id_vendor)
+            print("Liste des produits")
+            self.show_product_variant()
+            while True:
+                try:
+                    id_product=int(input("Entrez l'id du produit a ajouter au catalogue du vendeur:"))
+                    break
+                except:
+                    pass
+
+            with self.session_local() as session:
+                product_repository=ProductRepository(session)
+                product=product_repository.get_one(id_product)
+                if product is None:
+                    print("Produit non trouvé")
+                    return
+                price=None
+                for variant in product.product_variants:
+                    print("\t",variant,sep="")
+                    while True:
+                        try:
+                            val=input("Entrez le prix de achat du variant:")
+                            if not val and price is not None:
+                                pass
+                            else:
+                                price = float(val)
+                            break
+                        except:
+                            pass
+                    catalog=Catalog()
+                    catalog.vendor_id=id_vendor
+                    catalog.product_variant_id=variant.product_variant_id
+                    catalog.catalog_selling_price=price
+                    with self.session_local() as session:
+                        catalog_repository=CatalogRepository(session)
+                        existing= catalog_repository.get_one((catalog.product_variant_id,catalog.vendor_id))
+                        if existing:
+                            catalog_repository.update((catalog.product_variant_id,catalog.vendor_id),catalog)
+                        else:
+                            catalog_repository.add(catalog)
+            choix=-1
+            while True:
+                print("Continuer à encoder des produits?:")
+                print("\t1 - Oui")
+                print("\t0 - Non")
+                while choix<0 or choix>2:
+                    try:
+                        choix=int(input("Votre choix:"))
+                    except:
+                        print("Veillez à entrer un chiffre entre 0 et 1")
+                    if choix<0 and choix>6:
+                        print("Veillez à entrer un chiffre entre 0 et 1")
+                match choix:
+                    case 0:return
+                    case 1:break       
+
 
 #endregion

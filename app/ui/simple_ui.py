@@ -18,6 +18,7 @@ from app.models.vendor import Vendor
 from app.repositories.vendor_repository import VendorRepository
 from app.models.catalog import Catalog
 from app.repositories.catalog_repository import CatalogRepository
+from app.repositories.order_repository import OrderRepository
 
 from sqlalchemy.exc import IntegrityError
 
@@ -68,19 +69,195 @@ class SimpleUI:
     def operation_location(self):
         print("Operation: location")
         choix=-1
-        while choix!=0:
+        while True:
             print("Entrez le chiffre corespondant a votre choix:")
+            print("\t1 - Afficher les stocks réel dans toutes les locations")
+            print("\t2 - Afficher les stocks prévu dans toutes les locations")
+            print("\t3 - Transférer des produits d'une location à une autre")
+            print("\t4 - Commander des produits à un fourniseur")
+            print("\t5 - Simuler la modification d'état d'un ordre")
             print("\n\t0 - Revenir au menu principal")
 
-            while choix<0 or choix>0:
+            while choix<0 or choix>5:
                 try:
                     choix=int(input("Votre choix:"))
                 except:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 0 et 5")
                 if choix<1 and choix>8:
-                    print("Veillez à entrer un chiffre entre 1 et 8")
+                    print("Veillez à entrer un chiffre entre 0 et 5")
             match choix:
-                case 1:pass
+                case 1:self.show_stock()
+                case 2:self.show_predict()
+                case 3:self.transfert_order()
+                case 4:self.replenishment_order()
+                case 5:pass
+                case 0:return
+            choix=-1
+
+    def show_stock(self):
+        with self.session_local() as session:
+            stock_repository=StockRepository(session)
+            table = stock_repository.get_all()
+            location=None
+            for elem in table:
+                if not location==elem.location:
+                    location=elem.location
+                    print("\t",location,sep="")
+                print("\t\t",elem,sep="")
+
+    def show_predict(self):
+        with self.session_local() as session:
+            stock_repository=StockRepository(session)
+            test=stock_repository.get_prevision()
+
+    def transfert_order(self):
+        self.show_location()
+        while True:
+            try:
+                flocation_id=int(input("Entrez l'id de la location qui envoie les produits:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            location_repository=LocationRepository(session)
+            flocation = location_repository.get_one(flocation_id)
+        if flocation is None:
+            print("Location non trouvé")
+            return
+        while True:
+            try:
+                tlocation_id=int(input("Entrez l'id de la location qui les reçois:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            location_repository=LocationRepository(session)
+            tlocation = location_repository.get_one(tlocation_id)
+        if tlocation is None:
+            print("Location non trouvé")
+            return
+        
+        with self.session_local() as session:
+            stock_repository=StockRepository(session)
+            fstock = stock_repository.get_by_location(flocation_id)
+            commande=[]
+            while True:
+                for stock in fstock:
+                    print(stock)
+                while True:
+                    try:
+                        pv_id=int(input("Entrez l'id du variant à ajouté à la commande:"))
+                        break
+                    except:
+                        pass
+                    ##TODO check if product exist in vendor
+                
+                pv=None
+                for stock in fstock:
+                    if stock.product_variant_id==pv_id:
+                        pv=stock
+                if pv is None:
+                    print("Produit non trouvé")
+                else:
+                    while True:
+                        try:
+                            quantity=int(input("Entrez la quantité à la commande:"))
+                            break
+                        except:
+                            pass
+                    commande.append((pv_id,quantity))
+
+                choix=-1
+                while True:
+                    print("Continuer à ajouter des produits à la commande?:")
+                    print("\t1 - Oui")
+                    print("\t0 - Non")
+                    while choix<0 or choix>1:
+                        try:
+                            choix=int(input("Votre choix:"))
+                        except:
+                            print("Veillez à entrer un chiffre entre 0 et 1")
+                        if choix<0 and choix>6:
+                            print("Veillez à entrer un chiffre entre 0 et 1")
+                    match choix:
+                        case 0:
+                            order_repository= OrderRepository(session)
+                            order_repository.transfert_order(flocation_id,tlocation_id,commande)
+                            return
+                        case 1:break
+        
+
+    def replenishment_order(self):
+        self.show_location()
+        while True:
+            try:
+                location_id=int(input("Entrez l'id de la location qui commande:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            location_repository=LocationRepository(session)
+            location = location_repository.get_one(location_id)
+        if location is None:
+            print("Location non trouvé")
+            return
+        self.show_vendor()
+        while True:
+            try:
+                vendor_id=int(input("Entrez l'id du vendeur:"))
+                break
+            except:
+                pass
+        with self.session_local() as session:
+            vendor_repository=VendorRepository(session)
+            vendor = vendor_repository.get_one(vendor_id)
+            if vendor is None:
+                print("Vendeur non trouvé")
+                return
+        commande=[]
+        while True:
+            self.show_vendor_catalog(vendor_id)
+            while True:
+                try:
+                    pv_id=int(input("Entrez l'id du variant à ajouté à la commande:"))
+                    break
+                except:
+                    pass
+            with self.session_local() as session:
+                ##TODO check if product exist in vendor
+                pv_repository=ProductVariantRepository(session)
+                pv = pv_repository.get_one(pv_id)
+            if pv is None:
+                print("Produit non trouvé")
+            else:
+                while True:
+                    try:
+                        quantity=int(input("Entrez la quantité à la commande:"))
+                        break
+                    except:
+                        pass
+                commande.append((pv_id,quantity))
+
+            choix=-1
+            while True:
+                print("Continuer à ajouter des produits à la commande?:")
+                print("\t1 - Oui")
+                print("\t0 - Non")
+                while choix<0 or choix>1:
+                    try:
+                        choix=int(input("Votre choix:"))
+                    except:
+                        print("Veillez à entrer un chiffre entre 0 et 1")
+                    if choix<0 and choix>6:
+                        print("Veillez à entrer un chiffre entre 0 et 1")
+                match choix:
+                    case 0:
+                        with self.session_local() as session:
+                            order_repository= OrderRepository(session)
+                            order_repository.replenishment_order(vendor_id,location_id,commande)
+                        return
+                    case 1:break
+
 
 
     def operation_user(self):

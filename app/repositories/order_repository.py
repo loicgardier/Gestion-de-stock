@@ -4,7 +4,7 @@ from app.models.location_order_product_variant import LocationOrderProductVarian
 from app.models.transfert_order import TransfertOrder
 from app.models.transfert_order_product_variant import TransfertOrderProductVariant
 from app.models.order_status import OrderStatus
-from app.models.user_oder_product_variant import UserOrderProductVariant
+from app.models.user_order_product_variant import UserOrderProductVariant
 from app.models.user_order import UserOrder
 from sqlalchemy.orm import Session
 from sqlalchemy import and_

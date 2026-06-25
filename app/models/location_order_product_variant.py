@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship,Mapped,mapped_column
 from sqlalchemy import String,Integer,ForeignKey
 
 class LocationOrderProductVariant(Base):
-    __tablename__="location_oder_product_variant"
+    __tablename__="location_order_product_variant"
 
     product_variant_id: Mapped[int] = mapped_column(Integer,ForeignKey('product_variant.product_variant_id'),primary_key=True)
     location_order_id : Mapped[int] = mapped_column(Integer,ForeignKey('location_order.location_order_id'),primary_key=True)

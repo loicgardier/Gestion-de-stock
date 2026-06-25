@@ -8,7 +8,7 @@ from .catalog import Catalog
 from .vendor import Vendor
 from .user import User
 from .user_order import UserOrder
-from .user_oder_product_variant import UserOrderProductVariant
+from .user_order_product_variant import UserOrderProductVariant
 from .transfert_order import TransfertOrder
 from .transfert_order_product_variant import TransfertOrderProductVariant
 from .location_order import LocationOrder

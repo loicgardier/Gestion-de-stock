@@ -2,9 +2,8 @@
 from .base import Base
 from sqlalchemy.orm import relationship,Mapped,mapped_column
 from sqlalchemy import Integer,ForeignKey
-from .order import Order
 
-class LocationOrder(Base,Order):
+class LocationOrder(Base):
     __tablename__ = "location_order"
 
     location_order_id : Mapped[int] = mapped_column(Integer,primary_key=True)

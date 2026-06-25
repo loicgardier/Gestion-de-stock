@@ -106,9 +106,7 @@ class SimpleUI:
                 print("\t\t",elem,sep="")
 
     def show_predict(self):
-        with self.session_local() as session:
-            stock_repository=StockRepository(session)
-            test=stock_repository.get_prevision()
+        pass
 
     def transfert_order(self):
         self.show_location()
@@ -257,7 +255,9 @@ class SimpleUI:
                             order_repository.replenishment_order(vendor_id,location_id,commande)
                         return
                     case 1:break
-
+                    
+    def simulate_order_change(self):
+        pass
 
 
     def operation_user(self):

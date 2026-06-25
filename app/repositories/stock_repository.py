@@ -27,7 +27,6 @@ class StockRepository:
         return self.__session.query(Stock).order_by(Stock.location_id).all()
     
     def get_prevision(self):
-
         '''
 SELECT sub4.location_name,sub4.product_name,sub4.product_variant_color,sub4.product_variant_size,
 sub4.stock_quantity+COALESCE(sub4."lopv sum",0)-COALESCE(sub4."ftopv sum",0)+COALESCE(sub4."ttopv sum",0)-COALESCE(sub4."uopv sum",0)
@@ -81,34 +80,7 @@ ORDER BY sub4.location_name,sub4.product_name,sub4.product_variant_color,sub4.pr
 
 
 '''
-        from_transfer =aliased(TransfertOrder)
-        to_transfer = aliased(TransfertOrder)
-        user_order_status = aliased(OrderStatus)
-        from_transfert_status = aliased(OrderStatus)
-        to_transfert_status = aliased(OrderStatus)
-        location_order_status = aliased(OrderStatus)
-        prediction = self.__session.query(Stock,
-            LocationOrderProductVariant.location_order_product_variant_quantity,
-            UserOrderProductVariant.user_oder_product_variant_quantity,
-            TransfertOrderProductVariant.transfert_oder_product_variant_quantity).\
-            outerjoin(LocationOrderProductVariant,LocationOrderProductVariant.product_variant_id==Stock.product_variant_id).\
-            join(LocationOrder,and_(LocationOrder.location_order_id==LocationOrderProductVariant.location_order_id,
-                                    LocationOrder.location_id==Stock.location_id)).\
-            outerjoin(TransfertOrderProductVariant,TransfertOrderProductVariant.product_variant_id==Stock.product_variant_id).\
-            join(from_transfer,and_(from_transfer.transfert_order_id==TransfertOrderProductVariant.transfert_order_id,
-                                     from_transfer.from_location_id==Stock.location_id)).\
-            join(to_transfer,and_(to_transfer.transfert_order_id==TransfertOrderProductVariant.transfert_order_id,
-                                     to_transfer.to_location_id==Stock.location_id)).\
-            outerjoin(UserOrderProductVariant,UserOrderProductVariant.product_variant_id==Stock.product_variant_id).\
-            join(UserOrder,UserOrder.user_order_id==UserOrderProductVariant.user_order_id).\
-            join(Location,Location.location_id==Stock.location_id).\
-            join(User,and_(User.user_id==UserOrder.user_id,User.zone_id==Location.zone_id)).\
-            join(user_order_status,user_order_status.order_status_id==UserOrder.order_status_id).\
-            join(from_transfert_status,from_transfert_status.order_status_id==from_transfer.order_status_id).\
-            join(to_transfert_status,to_transfert_status.order_status_id==to_transfer.order_status_id).\
-            join(location_order_status,location_order_status.order_status_id==LocationOrder.order_status_id)
-        
-        return prediction.all()
+        pass
         
     
     def add(self,stock:Stock)->Stock:

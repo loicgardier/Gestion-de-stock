@@ -9,6 +9,7 @@ from app.models.user_order import UserOrder
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from app.models.stock import Stock
+from app.models.location import Location
 
 
 class OrderRepository:
@@ -115,7 +116,7 @@ class OrderRepository:
                 self.__session.add(stock)
             else:
                 stock.stock_quantity+=transfert_order_product_variant.transfert_oder_product_variant_quantity
-        transfert_order.order_status_id=self.get_order_status("ABORTED")
+        transfert_order.order_status_id=self.get_order_status("DELIVERED")
         self.__session.commit()  
 
     def transfert_aborted(self,id:int):
@@ -148,4 +149,49 @@ class OrderRepository:
             user_order_product_variant.product_variant_id=variant[0]
             user_order_product_variant.user_oder_product_variant_quantity=variant[1]
             self.__session.add(user_order_product_variant)
+        self.__session.commit()
+
+    def user_shipping(self,id:int):
+        user_order = self.__session.get(UserOrder,id)
+        if user_order is None:
+            raise ValueError(f"No order {id} found")
+        user_order.order_status_id=self.get_order_status("SHIPPED")
+        location_id = self.__session.query(Location.location_id).where(Location.zone_id==user_order.user.zone_id).scalar()
+        for user_order_product_variant in user_order.user_oder_product_variants:
+            stock = self.__session.query(Stock).\
+                where(and_(Stock.location_id==location_id,
+                           Stock.product_variant_id == user_order_product_variant.product_variant_id)).scalar()
+            if stock is None:
+                self.__session.rollback()
+                raise ValueError(f"Missing product in stock")
+            else:
+                stock.stock_quantity-=user_order_product_variant.user_oder_product_variant_quantity
+                if stock.stock_quantity<0:
+                    self.__session.rollback()
+                    raise ValueError(f"Too few product in stock")
+        self.__session.commit()
+
+    def user_delivered(self,id:int):
+        user_order = self.__session.get(UserOrder,id)
+        if user_order is None:
+            raise ValueError(f"No order {id} found")
+        user_order.order_status_id=self.get_order_status("DELIVERED")
+        self.__session.commit()  
+
+    def user_aborted(self,id:int):
+        user_order = self.__session.get(UserOrder,id)
+        if user_order is None:
+            raise ValueError(f"No order {id} found")
+        if user_order.order_status_id == self.get_order_status("SHIPPED"):
+            location_id = self.__session.query(Location.location_id).where(Location.zone_id==user_order.user.zone_id).scalar()
+            for user_order_product_variant in user_order.user_oder_product_variants:
+                stock = self.__session.query(Stock).\
+                    where(and_(Stock.location_id==location_id,
+                            Stock.product_variant_id == user_order_product_variant.product_variant_id)).scalar()
+                if stock is None:
+                    self.__session.rollback()
+                    raise ValueError(f"Missing product in stock")
+                else:
+                    stock.stock_quantity+=user_order_product_variant.user_oder_product_variant_quantity
+        user_order.order_status_id=self.get_order_status("ABORTED")
         self.__session.commit()
